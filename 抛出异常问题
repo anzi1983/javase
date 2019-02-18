@@ -1,0 +1,26 @@
+public static void test() throws Exception  {
+1 ：
+//在一段代码前面抛出一个异常，并且不进行捕获，向上抛出，那么后面的代码编译错误
+    throw new Exception("参数越界"); 
+    System.out.println("异常后"); //编译错误，「无法访问的语句」
+}
+
+2 ：
+//若一段代码前有异常抛出，并且这个异常被try...catch所捕获，若此时catch语句中没有抛出新的异常，则这段代码能够被执行，否则，同第1条。
+public static void test() {
+	try {
+		throw new Exception("111");
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	System.out.println("222");
+}
+
+
+3 ：
+//若在一个条件语句中抛出异常，向上抛，则程序能被编译，但后面的语句不会被执行。如果异常捕获，下面的语句正常执行
+if(true) {
+    throw new Exception("参数越界");   
+}
+System.out.println("异常后"); //抛出异常，不会执行
