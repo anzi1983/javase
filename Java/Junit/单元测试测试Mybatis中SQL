@@ -1,0 +1,29 @@
+0、在maven  pom文件中添加spring 、 mybatis 、 mysql、 spring.test 等相关的依赖
+ 1、定义Mapper接口，即dao层
+ 2、添加映射文件xml，namespace与dao层接口类名绑定，即mapper.xml。
+ 3、定义spring xml配置文件 主要有：SqlSessionFactory、dataSource、transactionManager、dao层扫描
+ 4、 编写单元测试类
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/META-INF/spring/DataMapperTest.xml")
+public class DataMapperTest
+{
+    @Autowired
+    private DataMapper dataMapper;
+
+    @Test
+    public void insertData() throws Exception
+    {
+        
+		逻辑代码
+
+
+    }
+
+}
