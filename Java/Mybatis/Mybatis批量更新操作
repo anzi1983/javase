@@ -1,0 +1,22 @@
+ <update id="updateUserList"  parameterType="list">
+        update tb_user t 
+        
+        //用case函数进行判断  
+        set t.age = case t.id  
+        //set一个字段   用一个foreach遍历一遍数组 用case函数进行赋值
+        <foreach separator=" " collection="list" item="u" index="index" open="" close="end">
+            WHEN #{u.id} then #{u.age}
+        </foreach>
+        // t.name = case t.id
+        ...
+        ...
+        ...和上面一样的操作   
+        
+        
+        where t.id in
+        <foreach separator="," collection="list" item="c" index="index" open="("  close=")">
+            #{c.id}
+        </foreach>
+    </update>
+    
+    疑惑：   批量操作万条数据效率是否会很差？
