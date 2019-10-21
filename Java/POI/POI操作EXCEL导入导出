@@ -1,0 +1,126 @@
+package com.uilts;
+
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.*;
+
+public class ExcelUtils {
+
+
+    public static void readExcel() {
+        Workbook workbook = null;
+        String source = "D:/upload/test.xls";
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            File file = new File(source);
+            if (!file.exists()) {
+                ExcelUtils.createExcel(source);
+            }
+            in = new FileInputStream(file);
+
+            //通用型WorkBook  不用在意是03 HSSFWorkbook 或者 07 XSSFWorkbook 的API
+            workbook = WorkbookFactory.create(in);
+            //设置单元格样式
+            CellStyle cellStyle = workbook.createCellStyle();
+
+            cellStyle.setBorderLeft(CellStyle.BORDER_THIN);
+            cellStyle.setBorderBottom(CellStyle.BORDER_THIN);
+            //字体样式
+            Font cellFont =workbook.createFont();
+
+
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Row row = sheet.getRow(0);
+
+            if (row == null) {
+                sheet.createRow(0);
+            }
+            row = sheet.getRow(0);
+            if (row != null) {
+                Cell cell = row.getCell(0);
+                if (cell == null) {
+                    row.createCell(0);
+                }
+                cell = row.getCell(0);
+                if (cell != null) {
+                    cell.setCellValue("aaaa");
+
+                    Hyperlink hyperlink =cell.getHyperlink();
+                    if(hyperlink==null){
+                        CreationHelper creationHelper =workbook.getCreationHelper();
+                        hyperlink=creationHelper.createHyperlink(Hyperlink.LINK_DOCUMENT);
+                        creationHelper=null;
+                    }
+                    String value ="https:\\www.baidu.com";
+                    hyperlink.setAddress(value);
+                    cell.setHyperlink(hyperlink);
+
+                    cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+                    cellFont.setUnderline((byte)1);
+
+                    System.out.println("aaaaaaaaaaa");
+                }
+
+            }
+
+            out = new FileOutputStream(source);
+            workbook.write(out);
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+    }
+
+    public static void createExcel(String path) throws Exception {
+        //创建Excel文件对象
+        HSSFWorkbook wb = new HSSFWorkbook();
+        //用文件对象创建sheet对象
+        HSSFSheet sheet = wb.createSheet("第一个sheet页");
+        //用sheet对象创建行对象
+        HSSFRow row = sheet.createRow(0);
+        //创建单元格样式
+        CellStyle cellStyle = wb.createCellStyle();
+        //用行对象创建单元格对象Cell
+        Cell cell = row.createCell(0);
+        //用cell对象读写。设置Excel工作表的值
+        cell.setCellValue(1);
+        //输出Excel文件
+        FileOutputStream output = new FileOutputStream(path);
+        wb.write(output);
+        output.flush();
+    }
+
+    public static void main(String[] args) {
+        ExcelUtils.readExcel();
+    }
+}
