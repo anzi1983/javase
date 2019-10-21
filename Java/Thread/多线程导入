@@ -1,0 +1,146 @@
+package com.uilts.rxThread;
+
+import com.beans.User;
+import com.service.impl.UserServiceImpl;
+import com.service.inface.UserServiceInface;
+import com.uilts.ExcelUtils;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.*;
+
+/**
+ * Created by panan on 2019/1/16.
+ */
+public class ThreadTest {
+
+
+
+    //内部类（线程类）
+    private class ThreadParallel implements Runnable {
+        private UserServiceInface userService;
+        private List<Map<String, String>> list;
+        private int index ;
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMDD");
+
+        public ThreadParallel(List<Map<String, String>> list, int i, UserServiceInface userService) {
+            this.list = list;
+            this.index = i;
+            this.userService = userService;
+        }
+
+        @Override
+        public void run() {
+                for(int i =0 ; i<list.size();i++){
+                    Map<String, String> map = list.get(i);
+                    String name = map.get("name");
+                    String age = map.get("age");
+                    String sex = map.get("sex");
+                    String idNum = format.format(new Date()) + index + i;
+                    User user = new User(idNum,name,Integer.parseInt(age),sex);
+                    userService.insertUser(user);
+                }
+        }
+    }
+        //回显方法
+        public  void ehcoImportInfo(List<Map<String, String>> list,UserServiceInface userServiceInface) {
+            //这个方法里面将调用内部类ThreadParallel
+            int listSize = list.size(); // 导入3000条数据
+            // 根据导入的数据量确定启动线程的个数（根据实际情况来确定）
+            int threadNum = 0; // 记录线程数量
+            if (listSize > 0 && listSize < 100) {
+                threadNum = 1;
+            } else {
+                if (listSize >= 1000 && listSize <= 3000) {
+                    threadNum = 10;
+                } else {
+                    if ((listSize % 100) == 0) {
+                        threadNum = listSize / 100;
+                    } else {
+                        threadNum = listSize / 100 + 1;
+                    }
+                }
+            }
+
+            List<List<Map<String, String>>> subList = splitList(excelList,excelList.size()/threadNum); // 存放一个范围内的导入数据
+	    
+            // 存放线程返回值
+            ExecutorService executor = Executors.newFixedThreadPool(threadNum); // 创建线程池
+            // 创建线程，并启动线程(这是关键，这里面创建了内部线程类的对象，里面传的参数，根据实际情况决定，相应的内部类中也要有对应的构造方法。利用submit可以启动线程，)
+            for (int x = 0; x < map.size(); x++) {
+                int i = (listSize/threadNum)*x + 1;
+                executor.execute(new ThreadParallel((List<Map<String, String>>) map.get(x),i,userServiceInface));
+            }
+            executor.shutdown(); // 关闭线程池 (此时是线程池不再接收任务  但是池子里的线程要执行完毕才关闭)
+            
+               while (true) { //判断线程池里的线程都执行完毕   有返回值可以使用Future去判断是否结束  没有返回值可以用其他更好的方法
+                    if (executor.isTerminated()) {
+                        return msg;
+                    }
+                    Thread.sleep(500);
+                }
+            
+            // 拼接提示信息(线程内容类实现的是Runnable  没有返回值  如果线程池需要返回值可以实现CallAble接口  用Future去接收线程的返回值)
+            //FutureTask<String> ft1 = new FutureTask<String>(ca1);
+            //ft1.get();
+        }
+	
+	private static <T> List<List<T>> splitList(List<T> list, int blockSize) {
+        List<List<T>> lists = new ArrayList<List<T>>();
+        if (blockSize == 1) {
+            lists.add(list);
+            return lists;
+        }
+        if (list != null && blockSize > 0) {
+            int listSize = list.size();
+            if (listSize <= blockSize) {
+                lists.add(list);
+                return lists;
+            }
+            int batchSize = listSize / blockSize;
+            int remain = listSize % blockSize;
+            for (int i = 0; i < batchSize; i++) {
+                int fromIndex = i * blockSize;
+                int toIndex = fromIndex + blockSize;
+                System.out.println("fromIndex=" + fromIndex + ", toIndex=" + toIndex);
+                lists.add(list.subList(fromIndex, toIndex));
+            }
+            if (remain > 0) {
+                System.out.println("fromIndex=" + (listSize - remain) + ", toIndex=" + (listSize));
+                lists.add(list.subList(listSize - remain, listSize));
+            }
+        }
+        return lists;
+    }
+
+    public static void main (String[] args){
+        Map<String, Object> result = ExcelUtils.readExcel("D:/test.xls");
+        // formid 为key,val为value，组装工单业务数据记录Map
+        List<Map<String, String>> excelList = (List<Map<String, String>>)result.get("data");
+        List<String> titleList = (List<String>)result.get("title");
+        System.out.print(excelList.toString());
+        ThreadTest threadTest = new ThreadTest();
+        threadTest.ehcoImportInfo(excelList);
+        
+        
+    }
+    
+    
+    
+    dao层  
+    public void insertUser(List<User> userList);
+    
+    xml层 
+    <insert id="insertUser" parameterType="java.util.List">
+		INSERT INTO tb_user (id,name,age,sex)
+		VALUES
+		<foreach collection ="list" item="user" index= "index" separator =",">
+	    (
+      #{user.id},
+			#{user.name},
+			#{user.age},
+			#{user.sex}
+      )
+	    </foreach >
+	</insert>
+
+}
