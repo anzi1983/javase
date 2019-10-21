@@ -1,0 +1,49 @@
+public class InputStream
+{
+    public static void readFile(){
+        File inFile = new File("D:/test/in.docx");
+        if(!inFile.exists())
+        {
+            System.out.println("error");
+            return;
+        }
+        File outFile = new File("D:/test/out.docx");
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        try
+        {
+            in = new FileInputStream(inFile);
+            out = new FileOutputStream(outFile);
+            byte[] imp = new byte[4096];
+            int len = in.read(imp);
+            while(len != -1)
+            {
+                out.write(imp,0, len);
+                len = in.read(imp);
+            }
+            out.flush();
+            out.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }finally
+        {
+            if(in != null)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
