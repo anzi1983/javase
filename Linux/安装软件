@@ -1,0 +1,12 @@
+安装JDK：
+     1、下载JDK的tar.gz包放到/user/目录下。
+     2、tar -zxvf jdk-8u222-linux-x64.tar.gz 解压。
+     3、vi /etc/profile 在最后文件末尾处，End前加上设置环境变量。
+        export PATH=$PATH:/usr/jdk1.8.0_222/bin
+        export JAVA_HOME=/usr/jdk1.8.0_222
+        export CLASSPATH=.:/usr/jdk1.8.0_222/lib/dt.jar:/usr/jdk1.8.0_222/lib/tools.jar
+     4、创建hwjdk.sh后，同样设置上面的环境变量，并加权限chmod 777 /etc/profile.d/hwjdk.sh。
+        vi /etc/profile.d/hwjdk.sh
+        export PATH=$PATH:/root/app/jdk1.8.0_212/bin
+        export JAVA_HOME=/root/app/jdk1.8.0_212
+     5、执行source /etc/profile 配置文件生效；或者让linux链接断开后，重连，java -version查看版本号
