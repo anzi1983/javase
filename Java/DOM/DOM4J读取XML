@@ -1,0 +1,133 @@
+private static void initData() {
+        Element root = getElement(CUSTOMIZE_CFGFILE);
+        if (root == null) {
+            UMLogger.error(TEOpGraphViewHandler.class, " initData ", "read gem cfg file failed: " + CUSTOMIZE_CFGFILE);
+            return;
+        }
+        Element element = root.element(ROOT_DESC);
+        List<Element> children = element.elements();
+        String strKey = "";
+        String strValue = "";
+        for (int i = 0, size = children.size(); i < size; i++) {
+            Element aChild = children.get(i);
+            strKey = aChild.attributeValue(RES_NAME);
+            strValue = aChild.attributeValue(RES_VALUE);
+            UMLogger.debug(TEOpGraphViewHandler.class, " initData ", "strKey : " + strKey + " strValue : " + strValue);
+            CustomizeMap.put(strKey, strValue);
+        }
+    }
+    
+JDOM：
+/** 定制使用的配置文件，该定制用于对光功率底板设备背景色 */
+    private static final String CUSTOMIZE_CFGFILE = "style/productstyle/conf/ext_unitedmgr_customize/unitedmgrconf_bakcolor.xml";
+
+    /** 节点名称 */
+    private static final String ROOT_DESC = "customizes";
+
+    /** 对象名称 */
+    private static final String RES_NAME = "resname";
+
+    /** 对象值 */
+    private static final String RES_VALUE = "value";
+
+    /** 开启云主题 */
+    private static final String OPEN_AUI2  = "white";
+
+    /** 关闭云主题 */
+    private static final String CLOSE_AUI2  = "gray";
+
+    /** 存储定制的对象 */
+    private static Map<String, String> CustomizeMap = new HashMap<String, String>(0);
+
+
+
+      Element root = UMXMLUtil.getRootElement(CUSTOMIZE_CFGFILE);
+        if (null == root)
+        {
+            UMLogger.error(TEOpGraphViewHandler.class," initData ", "read gem cfg file failed: " + CUSTOMIZE_CFGFILE);
+            return;
+        }
+
+        Element element = root.getChild(ROOT_DESC);
+        List<Element> children = element.getChildren();
+        String strKey = "";
+        String strValue = "";
+        for (int i = 0, size = children.size(); i < size; i++)
+        {
+            Element aChild = children.get(i);
+            strKey = aChild.getAttributeValue(RES_NAME);
+            strValue = aChild.getAttributeValue(RES_VALUE);
+            UMLogger.debug(TEOpGraphViewHandler.class, " initData ", "strKey : " + strKey + " strValue : " + strValue);
+            CustomizeMap.put(strKey, strValue);
+        }
+        
+DOM4J:
+
+ public static Element getElement(String xmlFile) {
+        SAXReader reader = new SAXReader();
+        Element root = null;
+        reader.setEncoding("UTF-8");
+        if ((xmlFile == null) || (xmlFile.length() == 0)) {
+            UMLogger.error(" xmlFile=" + xmlFile);
+            return null;
+        } else {
+            InputStream inputSteam = InmProfileFactory.getResourceInputStream(xmlFile);
+            try {
+                reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                Document doc = reader.read(inputSteam);
+                if (null == doc) {
+                    UMLogger.error(TEOpGraphViewHandler.class, " initData ", "read gem cfg file failed: " + CUSTOMIZE_CFGFILE);
+                    return null;
+                }
+                root = doc.getRootElement();
+                return root;
+            } catch (DocumentException ex) {
+                InmLogging.info("failed fileName=" + xmlFile);
+                UMLogger.exception("failed to getDocument", ex);
+                return null;
+            } catch (SAXException e) {
+                InmLogging.info("failed fileName=" + xmlFile);
+                UMLogger.exception("failed to getDocument", e);
+                return null;
+            } finally {
+                try {
+                    if (inputSteam != null) {
+                        inputSteam.close();
+                    }
+
+                } catch (IOException e) {
+                    InmLogging.info(e);
+                }
+            }
+        }
+    }
+
+
+
+
+
+private static URL _getResourceURL(String relevantFilepath) {
+    File file = getCustomizedFile(relevantFilepath);
+    if(file.exists() && file.isFile()) {
+        try {
+            return file.toURI().toURL();
+        } catch (Exception var8) {
+            ;
+        }
+    }
+
+private static InputStream _getResourceInputStream(String relevantFilepath) {
+    URL url = _getResourceURL(relevantFilepath);
+    if(url == null) {
+        return null;
+    } else {
+        try {
+            return url.openStream();
+        } catch (Exception var3) {
+            InmLogging.severe(var3);
+            return null;
+        }
+    }
+}
