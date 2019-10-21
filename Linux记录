@@ -1,0 +1,49 @@
+查看进程：
+     netstat常见参数
+
+    -a (all)显示所有选项，默认不显示LISTEN相关
+
+    -t (tcp)仅显示tcp相关选项
+
+    -u (udp)仅显示udp相关选项
+
+    -n 拒绝显示别名，能显示数字的全部转化成数字。
+
+    -l 仅列出有在 Listen (监听) 的服务状态
+
+    -p 显示建立相关链接的程序名
+
+    -r 显示路由信息，路由表
+
+    -e 显示扩展信息，例如uid等
+
+    -s 按各个协议进行统计
+
+    -c 每隔一个固定时间，执行该netstat命令。
+
+    提示：LISTEN和LISTENING的状态只有用-a或者-l才能看到
+
+            查看nginx的所有进程
+
+    ps -ef | grep U2kProxyService		查看U2kProxyService的所有进程
+
+    netstat -apn | grep 13161			查看13161端口占用情况
+
+    netstat -apn | grep 13165			查看13165端口占用情况
+
+    lsof -i :13161
+
+    lsof -i :13165
+ 
+ 安装JDK：
+     1、下载JDK的tar.gz包放到/user/目录下。
+     2、tar -zxvf jdk-8u222-linux-x64.tar.gz 解压。
+     3、vi /etc/profile 在最后文件末尾处，End前加上设置环境变量。
+        export PATH=$PATH:/usr/jdk1.8.0_222/bin
+        export JAVA_HOME=/usr/jdk1.8.0_222
+        export CLASSPATH=.:/usr/jdk1.8.0_222/lib/dt.jar:/usr/jdk1.8.0_222/lib/tools.jar
+     4、创建hwjdk.sh后，同样设置上面的环境变量，并加权限chmod 777 /etc/profile.d/hwjdk.sh。
+        vi /etc/profile.d/hwjdk.sh
+        export PATH=$PATH:/root/app/jdk1.8.0_212/bin
+        export JAVA_HOME=/root/app/jdk1.8.0_212
+     5、执行source /etc/profile 配置文件生效；或者让linux链接断开后，重连，java -version查看版本号
