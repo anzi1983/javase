@@ -1,0 +1,73 @@
+杀掉单个服务的进程  直接在sheel中 用ps -ef 搜出对应服务的进程号  kill -9 杀掉
+
+pid=`ps -ef | grep -v grep | grep 服务名 | sed -n '1P' | awk '{print $2}'`
+[[ -n $pid ]] && kill -9 $pid
+
+
+遍历端口  循环杀光相关进程，此时的进程是Nginx服务进程
+
+portnum="13161 13165"
+
+for port in ${portnum[@]}
+do
+	while :
+	do
+		pid=`lsof -i:$port | sed -n '2P' | awk '{print $2}'`
+
+		if test -z "$pid"
+		then
+			PRINT_LOG "INFO" "port: $port released, pid: $pid  process kill over, break"
+			break
+		else
+			PRINT_LOG "INFO" "port: $port still occupied, pid: $pid will be killed -9"
+			kill -9 $pid
+		fi
+	done
+done
+
+可以看出，当前节点下所有Nginx服务，都有一个服务的主（master）进程，还有多个worker进程，worker进程的ppid是主进程的pid，也就是说，下面四个worker进程是master进程的子进程，查看Nginx相关资料，发现Nginx采用的是多进程（单线程）&多路IO复用模型，使用了I/O多路复用技术的Nginx，就成了“并发事件驱动”的服务器。
+
+Nginx工作原理：https://blog.csdn.net/kim_weir/article/details/80036462
+
+Nginx的工作模式：
+        1、Nginx 在启动后，会有一个 master 进程和多个相互独立的 worker 进程。
+        2、接收来自外界的信号，向各worker进程发送信号，每个进程都有可能来处理这个连接。
+        3、 master 进程能监控 worker 进程的运行状态，当 worker 进程退出后(异常情况下)，会自动启动新的 worker 进程。
+        
+Kill -9 与kill -15的区别：https://www.cnblogs.com/yucongblog/p/6568374.html
+
+kill 发送SIGTERM（15）信号给进程，告诉进程，你需要被关闭，请自行停止运行并退出。
+kill -9 发送SIGKILL信号给进程，告诉进程，你被终结了，请立刻退出。
+kill -9 表示强制杀死该进程；与SIGTERM相比，这个信号不能被捕获或忽略，同时接收这个信号的进程在收到这个信号时不能执行任何清理。
+
+说的通俗易懂点就是：
+系统会发送一个SIGTERM（15）的信号给对应的程序。当程序接收到该signal后，将会发生以下的事情
+
+程序立刻停止
+当程序释放相应资源后再停止
+程序可能仍然继续运行
+      大部分程序接收到SIGTERM信号后，会先释放自己的资源，然后再停止。但是也有程序可以在接受到信号量后，做一些其他的事情，并且这些事情是可以
+
+      配置的。如果程序正在等待IO，可能就不会立马做出相应，造成阻塞。
+
+系统会发送一个SIGKILL（9）的信号给对应的程序。当程序接收到该signal后，程序立即停止，就直接给你干掉了，不等你，这个命令很暴躁哈。
+
+netstat -apn 命令是查看当前进程的连接情况，就是当前进程和哪个端口连接
+
+lsof -i 命令是查看当前端口有谁在使用，这个命令会把**13161所有的进程都列举出来，而netstat只会列举出当前连接的进程
+
+
+netstat常见参数
+-a (all)显示所有选项，默认不显示LISTEN相关
+-t (tcp)仅显示tcp相关选项
+-u (udp)仅显示udp相关选项
+-n 拒绝显示别名，能显示数字的全部转化成数字。
+-l 仅列出有在 Listen (**) 的服務状态
+
+-p 显示建立相关链接的程序名
+-r 显示路由信息，路由表
+-e 显示扩展信息，例如uid等
+-s 按各个协议进行统计
+-c 每隔一个固定时间，执行该netstat命令。
+
+linux查看端口占用和杀死进程：https://www.cnblogs.com/isdom/p/webclips075.html
