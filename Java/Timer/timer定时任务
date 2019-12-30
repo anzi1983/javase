@@ -1,0 +1,44 @@
+package com.panan.test.timer;
+
+import java.util.TimerTask;
+
+/**
+ * 定时任务
+ *
+ * @author panan
+ * @since 2019-12-09
+ */
+public class UpdateCertsTimer extends TimerTask {
+    /**
+     * 操作日志
+     */
+    private static final OssLog LOGGER = OssLogFactory.getLogger(UpdateCertsTimer.class);
+
+    private UpdateCertsTask updateCertsTask;
+
+    /**
+     * 证书更新定时任务启动器
+     *
+     * @param lastLabel sub版本号
+     * @param serviceId 预制id
+     * @param certType 证书类型
+     */
+    public UpdateCertsTimer(String lastLabel, String serviceId, String certType) {
+        updateCertsTask = new UpdateCertsTask(lastLabel, serviceId, certType);
+    }
+
+    @Override
+    public void run() {
+        ThreadPool.getInstance().execute(updateCertsTask);
+    }
+    
+    
+    class UpdateCertsTask implements Runnable{
+      @Override
+      public void run() {
+          synchronized (UpdateCertsTask.class) {
+           // do something
+          }
+       }
+    }
+}
