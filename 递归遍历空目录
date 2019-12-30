@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 功能描述
+ * 递归遍历空目录
  *
- * @author pWX761303
+ * @author panan
  * @since 2019-12-19
  */
 class DiGuiTest {
