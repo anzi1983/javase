@@ -1,0 +1,33 @@
+package com.panan.test;
+
+import java.io.StringReader;
+
+import com.sun.org.apache.bcel.internal.generic.Select;
+
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+
+/**
+ * sql解析
+ *
+ * @author panan
+ * @since 2019-12-19
+ */
+class SqlTest {
+    public static void main(String[] args) {
+        String sql = "要校验的SQL"
+        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+        try {
+            Select select = (Select) parserManager.parse(new StringReader(sql));
+
+            if (null == select) {
+                System.out.println("The sql is not a query: " + sql);
+            }
+        } catch (JSQLParserException e) {
+            // 解析失败，则说明不是一条合法的sql
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
