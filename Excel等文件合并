@@ -1,0 +1,69 @@
+package com.panan.test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+
+import org.apache.http.util.TextUtils;
+
+/**
+ * 功能描述
+ *
+ * @author panan
+ * @since 2019-12-30
+ */
+public class MergeFileTest {
+
+    public static void main(String[] args) {
+        String[] filesPath = new String[] {
+            "D:\\CodeHome\\TestHome\\test\\Netcheck-InventoryDB-vi_GetAllFiberInfo_0.csv",
+            "D:\\CodeHome\\TestHome\\test\\Netcheck-InventoryDB-vi_GetAllFiberInfo_1.csv"};
+
+        mergeFiles(filesPath, "D:\\CodeHome\\TestHome\\test\\MeregeFile.csv");
+    }
+
+
+    public static boolean mergeFiles(String[] fpaths, String resultPath) {
+        if (fpaths == null || fpaths.length < 1 || TextUtils.isEmpty(resultPath)) {
+            return false;
+        }
+        if (fpaths.length == 1) {
+            return new File(fpaths[0]).renameTo(new File(resultPath));
+        }
+
+        File[] files = new File[fpaths.length];
+        for (int i = 0; i < fpaths.length; i++) {
+            files[i] = new File(fpaths[i]);
+            if (TextUtils.isEmpty(fpaths[i]) || !files[i].exists() || !files[i].isFile()) {
+                return false;
+            }
+        }
+
+        File resultFile = new File(resultPath);
+
+        try {
+            FileChannel resultFileChannel = new FileOutputStream(resultFile, true).getChannel();
+            for (int i = 0; i < fpaths.length; i++) {
+                FileChannel blk = new FileInputStream(files[i]).getChannel();
+                resultFileChannel.transferFrom(blk, resultFileChannel.size(), blk.size());
+                blk.close();
+            }
+            resultFileChannel.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        for (int i = 0; i < fpaths.length; i++) {
+            files[i].delete();
+        }
+
+        return true;
+    }
+}
