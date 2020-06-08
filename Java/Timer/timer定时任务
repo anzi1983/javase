@@ -1,20 +1,18 @@
 package com.panan.test.timer;
 
-import java.util.TimerTask;
-
 /**
  * 定时任务
  *
  * @author panan
  * @since 2019-12-09
  */
-public class UpdateCertsTimer extends TimerTask {
+public class DoSomeThingsTimer extends TimerTask {
     /**
      * 操作日志
      */
-    private static final OssLog LOGGER = OssLogFactory.getLogger(UpdateCertsTimer.class);
+    private Logger logger;
 
-    private UpdateCertsTask updateCertsTask;
+    private Task task;
 
     /**
      * 证书更新定时任务启动器
@@ -23,20 +21,20 @@ public class UpdateCertsTimer extends TimerTask {
      * @param serviceId 预制id
      * @param certType 证书类型
      */
-    public UpdateCertsTimer(String lastLabel, String serviceId, String certType) {
-        updateCertsTask = new UpdateCertsTask(lastLabel, serviceId, certType);
+    public DoSomeThingsTimer(String aaa, String bbb, String ccc) {
+        task = new Task(aaa, bbb, ccc);
     }
 
     @Override
     public void run() {
-        ThreadPool.getInstance().execute(updateCertsTask);
+        ThreadPool.getInstance().execute(task);
     }
     
     
-    class UpdateCertsTask implements Runnable{
+    class Task implements Runnable{
       @Override
       public void run() {
-          synchronized (UpdateCertsTask.class) {
+          synchronized (Task.class) {
            // do something
           }
        }
