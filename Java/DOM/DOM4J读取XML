@@ -1,7 +1,7 @@
 private static void initData() {
         Element root = getElement(CUSTOMIZE_CFGFILE);
         if (root == null) {
-            UMLogger.error(TEOpGraphViewHandler.class, " initData ", "read gem cfg file failed: " + CUSTOMIZE_CFGFILE);
+            logger.error("read gem cfg file failed");
             return;
         }
         Element element = root.element(ROOT_DESC);
@@ -12,7 +12,6 @@ private static void initData() {
             Element aChild = children.get(i);
             strKey = aChild.attributeValue(RES_NAME);
             strValue = aChild.attributeValue(RES_VALUE);
-            UMLogger.debug(TEOpGraphViewHandler.class, " initData ", "strKey : " + strKey + " strValue : " + strValue);
             CustomizeMap.put(strKey, strValue);
         }
     }
