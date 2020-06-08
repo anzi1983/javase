@@ -25,11 +25,10 @@
 
             查看nginx的所有进程
 
-    ps -ef | grep U2kProxyService		查看U2kProxyService的所有进程
+    ps -ef | grep 进程名		查看进程
 
-    netstat -apn | grep 13161			查看13161端口占用情况
+    netstat -apn | grep 端口名			查看端口占用情况
 
-    netstat -apn | grep 13165			查看13165端口占用情况
 
     lsof -i :13161
 
